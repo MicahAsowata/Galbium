@@ -11,7 +11,7 @@ import (
 var tmpl = pongo2.Must(pongo2.FromFile("./templates/home.gohtml"))
 
 func (a *application) Home(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	err := tmpl.ExecuteWriter(pongo2.Context{"": ""}, w)
+	err := tmpl.ExecuteWriter(nil, w)
 	if err != nil {
 		http.Error(w, "Error displaying page", http.StatusInternalServerError)
 	}

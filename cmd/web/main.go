@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/MicahAsowata/Galbium/internal/models"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 )
 
@@ -15,11 +15,11 @@ type application struct {
 }
 
 func main() {
-	err := godotenv.Load("../../.env")
+	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("could not load the .env file")
 	}
-	dsn := os.Getenv("DB_NAME")
+	dsn := "galbius:galbius@/galbius"
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatal(err)

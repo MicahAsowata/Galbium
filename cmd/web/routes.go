@@ -11,7 +11,9 @@ func (a *application) routes() http.Handler {
 	//TODO: Setup proper routing system
 	//TODO: Setup all the routes
 	mux.HandlerFunc(http.MethodGet, "/", a.Home)
-	mux.HandlerFunc(http.MethodGet, "/todo", a.Todo)
+	mux.HandlerFunc(http.MethodGet, "/todo/new", a.NewTodo)
+	mux.HandlerFunc(http.MethodPost, "/todo/create", a.CreateTodo)
+	mux.HandlerFunc(http.MethodGet, "/todo/view/:id", a.GetTodo)
 
 	return mux
 }

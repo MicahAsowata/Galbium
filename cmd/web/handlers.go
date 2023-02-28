@@ -8,7 +8,9 @@ import (
 
 	"github.com/MicahAsowata/Galbium/internal/models"
 	"github.com/albrow/forms"
+	"github.com/dustin/go-humanize"
 	"github.com/flosch/pongo2/v6"
+	"github.com/julienschmidt/httprouter"
 )
 
 // TODO: Setup the basic handlers
@@ -27,7 +29,6 @@ func (a *application) NewTodo(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Error displaying page", http.StatusInternalServerError)
 	}
-
 }
 func (a *application) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	todoData, err := forms.Parse(r)
@@ -61,13 +62,12 @@ func (a *application) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// path := fmt.Sprintf("/todo/%d", int(insertedID))
-	// http.Redirect(w, r, "/todo/view", http.StatusSeeOther)
-	// fmt.Fprintln(w, path)
-	fmt.Fprintf(w, "Created todo %d", int(insertedID))
+	path := fmt.Sprintf("/todo/view/%d", int(insertedID))
+	http.Redirect(w, r, path, http.StatusSeeOther)
 }
-func (a *application) GetTodo(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+func (a *application) GetTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	tmpl := pongo2.Must(pongo2.FromFile("./templates/view.gohtml"))
+	id, err := strconv.Atoi(ps.ByName("id"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,8 +75,11 @@ func (a *application) GetTodo(w http.ResponseWriter, r *http.Request) {
 
 	todo, err := a.Queries.GetTodo(r.Context(), todoId)
 	if err != nil {
-		http.NotFound(w, r)
+		log.Fatal(err)
+	}
+	err = tmpl.ExecuteWriter(pongo2.Context{"todo": todo, "created": humanize.Time(todo.Created)}, w)
+	if err != nil {
+		http.Error(w, "Error displaying page", http.StatusInternalServerError)
 		return
 	}
-
 }

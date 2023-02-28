@@ -19,7 +19,7 @@ func main() {
 	if err != nil {
 		log.Fatal("could not load the .env file")
 	}
-	dsn := "galbius:galbius@/galbius"
+	dsn := "galbius:galbius@/galbius?parseTime=true"
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatal(err)

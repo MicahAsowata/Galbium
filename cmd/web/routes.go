@@ -13,7 +13,7 @@ func (a *application) routes() http.Handler {
 	mux.HandlerFunc(http.MethodGet, "/", a.Home)
 	mux.HandlerFunc(http.MethodGet, "/todo/new", a.NewTodo)
 	mux.HandlerFunc(http.MethodPost, "/todo/create", a.CreateTodo)
-	mux.HandlerFunc(http.MethodGet, "/todo/view/:id", a.GetTodo)
+	mux.GET("/todo/view/:id", a.GetTodo)
 
 	return mux
 }

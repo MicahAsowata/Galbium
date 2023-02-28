@@ -14,6 +14,7 @@ func (a *application) routes() http.Handler {
 	mux.HandlerFunc(http.MethodGet, "/todo/new", a.NewTodo)
 	mux.HandlerFunc(http.MethodPost, "/todo/create", a.CreateTodo)
 	mux.GET("/todo/view/:id", a.GetTodo)
+	mux.HandlerFunc(http.MethodGet, "/todo", a.Index)
 
 	return mux
 }

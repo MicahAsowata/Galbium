@@ -8,3 +8,8 @@ INSERT INTO todo (
 ) VALUES (
   ?, ?, ?
 );
+
+-- name: ListTodo :many
+SELECT * FROM todo
+WHERE name != ''
+ORDER BY created;

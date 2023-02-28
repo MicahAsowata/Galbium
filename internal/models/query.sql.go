@@ -45,3 +45,38 @@ func (q *Queries) GetTodo(ctx context.Context, id int64) (Todo, error) {
 	)
 	return i, err
 }
+
+const listTodo = `-- name: ListTodo :many
+SELECT id, name, details, completed, created FROM todo
+WHERE name != ''
+ORDER BY created
+`
+
+func (q *Queries) ListTodo(ctx context.Context) ([]Todo, error) {
+	rows, err := q.db.QueryContext(ctx, listTodo)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Todo
+	for rows.Next() {
+		var i Todo
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Details,
+			&i.Completed,
+			&i.Created,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

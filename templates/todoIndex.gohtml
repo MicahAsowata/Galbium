@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Todo-{{todo.ID}}</title>
+    <title>All Todos</title>
 </head>
 <body>
-    <h1>{{todo.Name}}</h1>
-    <p>{{todo.Details}}</p>
-    <p>Created {{ created}}</p>
+    {%for todo in todos%}
+        <h1>{{todo.Name}}</h1>
+        <a href="/todo/view/{{todo.ID}}">See the details</a>
+    {%endfor%}
 </body>
 </html>

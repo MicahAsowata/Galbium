@@ -83,3 +83,18 @@ func (a *application) GetTodo(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 }
+
+func (a *application) Index(w http.ResponseWriter, r *http.Request) {
+	tmpl := pongo2.Must(pongo2.FromFile("./templates/todoIndex.gohtml"))
+
+	todos, err := a.Queries.ListTodo(r.Context())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = tmpl.ExecuteWriter(pongo2.Context{"todos": todos}, w)
+	if err != nil {
+		http.Error(w, "Error displaying page", http.StatusInternalServerError)
+		return
+	}
+}

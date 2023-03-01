@@ -28,6 +28,15 @@ func (q *Queries) CreateTodo(ctx context.Context, arg CreateTodoParams) (sql.Res
 	return q.db.ExecContext(ctx, createTodo, arg.Name, arg.Details, arg.Completed)
 }
 
+const deleteTodo = `-- name: DeleteTodo :exec
+DELETE FROM todo WHERE id = ?
+`
+
+func (q *Queries) DeleteTodo(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteTodo, id)
+	return err
+}
+
 const getTodo = `-- name: GetTodo :one
 SELECT id, name, details, completed, created FROM todo
 WHERE id = ? LIMIT 1

@@ -144,3 +144,18 @@ func (a *application) UpdateTodo(w http.ResponseWriter, r *http.Request, ps http
 	path := fmt.Sprintf("/todo/view/%d", id)
 	http.Redirect(w, r, path, http.StatusSeeOther)
 }
+
+func (a *application) DeleteTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, err := strconv.Atoi(ps.ByName("id"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	todoID := int64(id)
+
+	err = a.Queries.DeleteTodo(r.Context(), todoID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	http.Redirect(w, r, "/todo", http.StatusSeeOther)
+}

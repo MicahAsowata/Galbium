@@ -17,3 +17,6 @@ ORDER BY created;
 -- name: UpdateTodo :exec
 UPDATE todo SET name = ?, details = ?, completed = ? 
 WHERE id = ?;
+
+-- name: DeleteTodo :exec
+DELETE FROM todo WHERE id = ?;

@@ -12,7 +12,7 @@ import (
 	"github.com/albrow/forms"
 	"github.com/dustin/go-humanize"
 	"github.com/flosch/pongo2/v6"
-	"github.com/julienschmidt/httprouter"
+	"github.com/go-chi/chi/v5"
 )
 
 // TODO: Setup the basic handlers
@@ -60,9 +60,9 @@ func (a *application) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	path := fmt.Sprintf("/todo/view/%d", int(insertedID))
 	http.Redirect(w, r, path, http.StatusSeeOther)
 }
-func (a *application) GetTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (a *application) GetTodo(w http.ResponseWriter, r *http.Request) {
 	tmpl := pongo2.Must(pongo2.FromFile("./templates/view.gohtml"))
-	id, err := strconv.Atoi(ps.ByName("id"))
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -93,9 +93,9 @@ func (a *application) Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-func (a *application) EditTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (a *application) EditTodo(w http.ResponseWriter, r *http.Request) {
 	tmpl := pongo2.Must(pongo2.FromFile("./templates/editTodo.gohtml"))
-	id, err := strconv.Atoi(ps.ByName("id"))
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -109,8 +109,8 @@ func (a *application) EditTodo(w http.ResponseWriter, r *http.Request, ps httpro
 		log.Fatal(err)
 	}
 }
-func (a *application) UpdateTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	id, err := strconv.Atoi(ps.ByName("id"))
+func (a *application) UpdateTodo(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -145,8 +145,8 @@ func (a *application) UpdateTodo(w http.ResponseWriter, r *http.Request, ps http
 	http.Redirect(w, r, path, http.StatusSeeOther)
 }
 
-func (a *application) DeleteTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	id, err := strconv.Atoi(ps.ByName("id"))
+func (a *application) DeleteTodo(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		log.Fatal(err)
 	}

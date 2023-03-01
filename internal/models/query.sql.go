@@ -30,7 +30,7 @@ func (q *Queries) CreateTodo(ctx context.Context, arg CreateTodoParams) (sql.Res
 
 const getTodo = `-- name: GetTodo :one
 SELECT id, name, details, completed, created FROM todo
-WHERE id = ? AND completed != TRUE LIMIT 1
+WHERE id = ? LIMIT 1
 `
 
 func (q *Queries) GetTodo(ctx context.Context, id int64) (Todo, error) {
@@ -79,4 +79,26 @@ func (q *Queries) ListTodo(ctx context.Context) ([]Todo, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateTodo = `-- name: UpdateTodo :exec
+UPDATE todo SET name = ?, details = ?, completed = ? 
+WHERE id = ?
+`
+
+type UpdateTodoParams struct {
+	Name      string
+	Details   string
+	Completed bool
+	ID        int64
+}
+
+func (q *Queries) UpdateTodo(ctx context.Context, arg UpdateTodoParams) error {
+	_, err := q.db.ExecContext(ctx, updateTodo,
+		arg.Name,
+		arg.Details,
+		arg.Completed,
+		arg.ID,
+	)
+	return err
 }

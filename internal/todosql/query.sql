@@ -1,6 +1,6 @@
 -- name: GetTodo :one
 SELECT * FROM todo
-WHERE id = ? AND completed != TRUE LIMIT 1;
+WHERE id = ? LIMIT 1;
 
 -- name: CreateTodo :execresult
 INSERT INTO todo (
@@ -13,3 +13,7 @@ INSERT INTO todo (
 SELECT * FROM todo
 WHERE name != ''
 ORDER BY created;
+
+-- name: UpdateTodo :exec
+UPDATE todo SET name = ?, details = ?, completed = ? 
+WHERE id = ?;

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -41,17 +43,10 @@ func (a *application) CreateTodo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid data", http.StatusBadRequest)
 		return
 	}
-
-	var completedAsBool bool
-	if todoData.Get("completed") == "on" {
-		completedAsBool = true
-	} else {
-		completedAsBool = false
-	}
 	results, err := a.Queries.CreateTodo(r.Context(), models.CreateTodoParams{
 		Name:      todoData.Get("name"),
 		Details:   todoData.Get("details"),
-		Completed: completedAsBool,
+		Completed: true,
 	})
 
 	if err != nil {
@@ -97,4 +92,55 @@ func (a *application) Index(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error displaying page", http.StatusInternalServerError)
 		return
 	}
+}
+func (a *application) EditTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	tmpl := pongo2.Must(pongo2.FromFile("./templates/editTodo.gohtml"))
+	id, err := strconv.Atoi(ps.ByName("id"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	todoID := int64(id)
+	todo, err := a.Queries.GetTodo(r.Context(), todoID)
+	if errors.Is(err, sql.ErrNoRows) {
+		log.Fatal("User not found")
+	}
+	err = tmpl.ExecuteWriter(pongo2.Context{"todo": todo}, w)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+func (a *application) UpdateTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, err := strconv.Atoi(ps.ByName("id"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	todoId := int64(id)
+
+	updateTodoData, err := forms.Parse(r)
+	if err != nil {
+		log.Fatal(err)
+	}
+	validator := updateTodoData.Validator()
+	validator.Require("name")
+
+	var completedAsBool bool
+	if updateTodoData.Get("completed") == "on" {
+		completedAsBool = true
+	} else {
+		completedAsBool = false
+	}
+
+	err = a.Queries.UpdateTodo(r.Context(), models.UpdateTodoParams{
+		Name:      updateTodoData.Get("name"),
+		Details:   updateTodoData.Get("details"),
+		Completed: completedAsBool,
+		ID:        todoId,
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	path := fmt.Sprintf("/todo/view/%d", id)
+	http.Redirect(w, r, path, http.StatusSeeOther)
 }

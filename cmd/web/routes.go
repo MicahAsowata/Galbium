@@ -9,7 +9,6 @@ import (
 
 func (a *application) routes() http.Handler {
 	router := chi.NewRouter()
-	router.Use(middleware.RealIP)
 	router.Use(middleware.Logger)
 	router.Use(middleware.CleanPath)
 	router.Get("/", a.Home)
@@ -20,5 +19,10 @@ func (a *application) routes() http.Handler {
 	router.Get("/todo/edit/{id}", a.EditTodo)
 	router.Post("/todo/update/{id}", a.UpdateTodo)
 	router.Get("/todo/delete/{id}", a.DeleteTodo)
+	router.Get("/user/signup", a.SignUpUser)
+	router.Post("/user/signup", a.SignUpUserPost)
+	router.Get("/user/login", a.LoginUser)
+	router.Post("/user/login", a.LoginUserPost)
+	router.Post("/user/logout", a.LogoutUser)
 	return router
 }

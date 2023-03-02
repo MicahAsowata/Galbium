@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/MicahAsowata/Galbium/internal/models"
 	"github.com/albrow/forms"
 	"github.com/flosch/pongo2/v6"
 )
@@ -40,6 +41,18 @@ func (a *application) SignUpUserPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err = a.Users.Insert(r.Context(), models.InsertUsersParams{
+		Name:     todoData.Get("name"),
+		Email:    todoData.Get("email"),
+		Username: todoData.Get("username"),
+		Password: todoData.Get("password"),
+	})
+
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	http.Redirect(w, r, "/todo", http.StatusSeeOther)
 }
 
 func (a *application) LoginUser(w http.ResponseWriter, r *http.Request) {

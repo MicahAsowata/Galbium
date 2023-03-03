@@ -34,6 +34,7 @@ func main() {
 	sessionManager := scs.New()
 	sessionManager.Store = mysqlstore.New(db)
 	sessionManager.Lifetime = time.Hour * 12
+	sessionManager.Cookie.Persist = false
 	a := application{
 		Queries:        queries,
 		Users:          &models.Users{DB: db},

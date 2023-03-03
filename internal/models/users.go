@@ -79,6 +79,16 @@ func (u *Users) Authenticate(ctx context.Context, arg AuthUserParams) (int, erro
 	return id, nil
 }
 
-func (u *Users) Exists(ctx context.Context, id int) (bool, error) {
-	return false, nil
+const getUser = `SELECT username FROM users WHERE id = ?`
+
+func (u *Users) Get(ctx context.Context, id int) (string, error) {
+	var username string
+	err := u.DB.QueryRowContext(ctx, getUser, id).Scan(&username)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", errors.New("the information you put in weren't correct")
+		}
+		return "", err
+	}
+	return username, nil
 }

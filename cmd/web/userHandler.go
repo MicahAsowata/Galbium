@@ -81,7 +81,7 @@ func (a *application) LoginUserPost(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Invalid data")
 		return
 	}
-	_, err = a.Users.Authenticate(r.Context(), models.AuthUserParams{
+	id, err := a.Users.Authenticate(r.Context(), models.AuthUserParams{
 		Email:    todoData.Get("email"),
 		Password: todoData.Get("password"),
 	})
@@ -89,9 +89,23 @@ func (a *application) LoginUserPost(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	a.SessionManager.RenewToken(r.Context())
+	a.SessionManager.Put(r.Context(), "userID", id)
+	a.SessionManager.RememberMe(r.Context(), true)
 	http.Redirect(w, r, "/todo", http.StatusSeeOther)
 }
 
 func (a *application) LogoutUser(w http.ResponseWriter, r *http.Request) {
+	err := a.SessionManager.RenewToken(r.Context())
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	a.SessionManager.Remove(r.Context(), "userID")
+
+	a.SessionManager.RenewToken(r.Context())
+
+	a.SessionManager.Put(r.Context(), "flash", "logged out successfully")
+
+	http.Redirect(w, r, "/todo", http.StatusSeeOther)
 }

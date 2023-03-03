@@ -7,6 +7,9 @@
     <title>All Todos</title>
 </head>
 <body>
+    {%if username != ""%}
+        <p>Welcome {{username}}</p>
+    {%endif%}
     {%for todo in todos%}
         <h1>{{todo.Name}}</h1>
         <a href="/todo/view/{{todo.ID}}">See the details</a>

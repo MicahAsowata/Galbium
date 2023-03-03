@@ -72,7 +72,8 @@ func (a *application) GetTodo(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = tmpl.ExecuteWriter(pongo2.Context{"todo": todo, "created": humanize.Time(todo.Created), "flash": a.SessionManager.PopString(r.Context(), "flash")}, w)
+	flash := a.SessionManager.PopString(r.Context(), "flash")
+	err = tmpl.ExecuteWriter(pongo2.Context{"todo": todo, "created": humanize.Time(todo.Created), "flash": flash}, w)
 	if err != nil {
 		http.Error(w, "Error displaying page", http.StatusInternalServerError)
 		return
@@ -86,8 +87,17 @@ func (a *application) Index(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	userID := a.SessionManager.GetInt(r.Context(), "userID")
+	var username string
+	if userID != 0 {
+		getusername, err := a.Users.Get(r.Context(), userID)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	err = tmpl.ExecuteWriter(pongo2.Context{"todos": todos}, w)
+		username = getusername
+	}
+	err = tmpl.ExecuteWriter(pongo2.Context{"todos": todos, "username": username}, w)
 	if err != nil {
 		http.Error(w, "Error displaying page", http.StatusInternalServerError)
 		return

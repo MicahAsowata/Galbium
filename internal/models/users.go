@@ -49,13 +49,34 @@ func (u *Users) Insert(ctx context.Context, arg InsertUsersParams) error {
 	return nil
 }
 
+const authUser = `SELECT id, password_hash FROM users WHERE email = ?`
+
 type AuthUserParams struct {
 	Email    string
 	Password string
 }
 
 func (u *Users) Authenticate(ctx context.Context, arg AuthUserParams) (int, error) {
-	return 0, nil
+	var id int
+	var passwordHash []byte
+
+	err := u.DB.QueryRowContext(ctx, authUser, arg.Email).Scan(&id, &passwordHash)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, errors.New("the information you put in weren't correct")
+		}
+		return 0, err
+	}
+
+	err = bcrypt.CompareHashAndPassword(passwordHash, []byte(arg.Password))
+	if err != nil {
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return 0, errors.New("the information you put in weren't correct")
+		}
+		return 0, err
+	}
+
+	return id, nil
 }
 
 func (u *Users) Exists(ctx context.Context, id int) (bool, error) {

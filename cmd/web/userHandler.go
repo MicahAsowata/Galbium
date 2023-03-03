@@ -65,7 +65,31 @@ func (a *application) LoginUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *application) LoginUserPost(w http.ResponseWriter, r *http.Request) {
+	todoData, err := forms.Parse(r)
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	validator := todoData.Validator()
+	validator.Require("email")
+	validator.MatchEmail("email")
+	validator.MaxLength("email", 280)
+	validator.Require("password")
+	validator.LengthRange("password", 8, 280)
+
+	if validator.HasErrors() {
+		fmt.Fprintln(w, "Invalid data")
+		return
+	}
+	_, err = a.Users.Authenticate(r.Context(), models.AuthUserParams{
+		Email:    todoData.Get("email"),
+		Password: todoData.Get("password"),
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	http.Redirect(w, r, "/todo", http.StatusSeeOther)
 }
 
 func (a *application) LogoutUser(w http.ResponseWriter, r *http.Request) {

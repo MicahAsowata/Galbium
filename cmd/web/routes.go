@@ -11,6 +11,7 @@ func (a *application) routes() http.Handler {
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Use(middleware.CleanPath)
+	router.Use(middleware.Recoverer)
 	router.Get("/", a.Home)
 	router.Get("/todo/new", a.NewTodo)
 	router.Post("/todo/create", a.CreateTodo)

@@ -16,7 +16,6 @@ import (
 )
 
 // TODO: Setup the basic handlers
-
 func (a *application) Home(w http.ResponseWriter, r *http.Request) {
 	tmpl := pongo2.Must(pongo2.FromFile("./templates/home.gohtml"))
 	err := tmpl.ExecuteWriter(nil, w)
@@ -58,6 +57,7 @@ func (a *application) CreateTodo(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	path := fmt.Sprintf("/todo/view/%d", int(insertedID))
+	a.SessionManager.Put(r.Context(), "flash", "todo created successfully")
 	http.Redirect(w, r, path, http.StatusSeeOther)
 }
 func (a *application) GetTodo(w http.ResponseWriter, r *http.Request) {
@@ -72,7 +72,7 @@ func (a *application) GetTodo(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = tmpl.ExecuteWriter(pongo2.Context{"todo": todo, "created": humanize.Time(todo.Created)}, w)
+	err = tmpl.ExecuteWriter(pongo2.Context{"todo": todo, "created": humanize.Time(todo.Created), "flash": a.SessionManager.PopString(r.Context(), "flash")}, w)
 	if err != nil {
 		http.Error(w, "Error displaying page", http.StatusInternalServerError)
 		return

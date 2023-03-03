@@ -4,15 +4,19 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/MicahAsowata/Galbium/internal/models"
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 )
 
 type application struct {
-	Queries *models.Queries
-	Users   *models.Users
+	Queries        *models.Queries
+	Users          *models.Users
+	SessionManager *scs.SessionManager
 }
 
 func main() {
@@ -27,9 +31,13 @@ func main() {
 	}
 
 	queries := models.New(db)
+	sessionManager := scs.New()
+	sessionManager.Store = mysqlstore.New(db)
+	sessionManager.Lifetime = time.Hour * 12
 	a := application{
-		Queries: queries,
-		Users:   &models.Users{DB: db},
+		Queries:        queries,
+		Users:          &models.Users{DB: db},
+		SessionManager: sessionManager,
 	}
 	log.Println("Starting server for http://localhost:4000")
 	err = http.ListenAndServe(":4000", a.routes())

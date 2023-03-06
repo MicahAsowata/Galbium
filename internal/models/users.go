@@ -49,7 +49,7 @@ func (u *Users) Insert(ctx context.Context, arg InsertUsersParams) error {
 	return nil
 }
 
-const authUser = `SELECT id, password_hash FROM users WHERE email = ?`
+const authUser = `SELECT user_id, password_hash FROM users WHERE email = ?`
 
 type AuthUserParams struct {
 	Email    string
@@ -79,7 +79,7 @@ func (u *Users) Authenticate(ctx context.Context, arg AuthUserParams) (int, erro
 	return id, nil
 }
 
-const getUserName = `SELECT username FROM users WHERE id = ?`
+const getUserName = `SELECT username FROM users WHERE user_id = ?`
 
 func (u *Users) Get(ctx context.Context, id int) (string, error) {
 	var username string

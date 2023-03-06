@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/MicahAsowata/Galbium/internal/models"
@@ -22,7 +21,7 @@ func (a *application) SignUpUser(w http.ResponseWriter, r *http.Request) {
 func (a *application) SignUpUserPost(w http.ResponseWriter, r *http.Request) {
 	todoData, err := forms.Parse(r)
 	if err != nil {
-		log.Fatal(err)
+		a.Logger.Error(err.Error())
 	}
 
 	validator := todoData.Validator()
@@ -49,7 +48,7 @@ func (a *application) SignUpUserPost(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		a.Logger.Error(err.Error())
 		return
 	}
 	http.Redirect(w, r, "/todo", http.StatusSeeOther)
@@ -67,7 +66,7 @@ func (a *application) LoginUser(w http.ResponseWriter, r *http.Request) {
 func (a *application) LoginUserPost(w http.ResponseWriter, r *http.Request) {
 	todoData, err := forms.Parse(r)
 	if err != nil {
-		log.Fatal(err)
+		a.Logger.Error(err.Error())
 	}
 
 	validator := todoData.Validator()
@@ -81,16 +80,16 @@ func (a *application) LoginUserPost(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Invalid data")
 		return
 	}
-	id, err := a.Users.Authenticate(r.Context(), models.AuthUserParams{
+	user_id, err := a.Users.Authenticate(r.Context(), models.AuthUserParams{
 		Email:    todoData.Get("email"),
 		Password: todoData.Get("password"),
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		a.Logger.Error(err.Error())
 	}
 	a.SessionManager.RenewToken(r.Context())
-	a.SessionManager.Put(r.Context(), "userID", id)
+	a.SessionManager.Put(r.Context(), "userID", user_id)
 	a.SessionManager.RememberMe(r.Context(), true)
 	http.Redirect(w, r, "/todo", http.StatusSeeOther)
 }
@@ -98,7 +97,7 @@ func (a *application) LoginUserPost(w http.ResponseWriter, r *http.Request) {
 func (a *application) LogoutUser(w http.ResponseWriter, r *http.Request) {
 	err := a.SessionManager.RenewToken(r.Context())
 	if err != nil {
-		log.Fatal(err)
+		a.Logger.Error(err.Error())
 	}
 
 	a.SessionManager.Remove(r.Context(), "userID")
@@ -123,7 +122,7 @@ func (a *application) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 func (a *application) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	resetData, err := forms.Parse(r)
 	if err != nil {
-		log.Fatal(err)
+		a.Logger.Error(err.Error())
 	}
 
 	validator := resetData.Validator()

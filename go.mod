@@ -18,5 +18,11 @@ require (
 	github.com/alexedwards/flow v0.0.0-20220806114457-cf11be9e0e03
 	github.com/alexedwards/scs/mysqlstore v0.0.0-20230217120314-6b1bedc0f08c
 	github.com/alexedwards/scs/v2 v2.5.0
+	go.uber.org/zap v1.24.0
 	golang.org/x/crypto v0.6.0
+)
+
+require (
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.6.0 // indirect
 )

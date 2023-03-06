@@ -10,9 +10,9 @@ import (
 
 	"github.com/MicahAsowata/Galbium/internal/models"
 	"github.com/albrow/forms"
+	"github.com/alexedwards/flow"
 	"github.com/dustin/go-humanize"
 	"github.com/flosch/pongo2/v6"
-	"github.com/go-chi/chi/v5"
 )
 
 // TODO: Setup the basic handlers
@@ -62,7 +62,7 @@ func (a *application) CreateTodo(w http.ResponseWriter, r *http.Request) {
 }
 func (a *application) GetTodo(w http.ResponseWriter, r *http.Request) {
 	tmpl := pongo2.Must(pongo2.FromFile("./templates/view.gohtml"))
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	id, err := strconv.Atoi(flow.Param(r.Context(), "id"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -73,7 +73,7 @@ func (a *application) GetTodo(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	flash := a.SessionManager.PopString(r.Context(), "flash")
-	err = tmpl.ExecuteWriter(pongo2.Context{"todo": todo, "created": humanize.Time(todo.Created), "flash": flash}, w)
+	err = tmpl.ExecuteWriter(pongo2.Context{"todo": todo, "created": humanize.Time(todo.Created.UTC()), "flash": flash}, w)
 	if err != nil {
 		http.Error(w, "Error displaying page", http.StatusInternalServerError)
 		return
@@ -105,7 +105,7 @@ func (a *application) Index(w http.ResponseWriter, r *http.Request) {
 }
 func (a *application) EditTodo(w http.ResponseWriter, r *http.Request) {
 	tmpl := pongo2.Must(pongo2.FromFile("./templates/editTodo.gohtml"))
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	id, err := strconv.Atoi(flow.Param(r.Context(), "id"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -120,7 +120,7 @@ func (a *application) EditTodo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func (a *application) UpdateTodo(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	id, err := strconv.Atoi(flow.Param(r.Context(), "id"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -156,7 +156,7 @@ func (a *application) UpdateTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *application) DeleteTodo(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	id, err := strconv.Atoi(flow.Param(r.Context(), "id"))
 	if err != nil {
 		log.Fatal(err)
 	}

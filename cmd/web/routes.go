@@ -21,7 +21,7 @@ func (a *application) routes() http.Handler {
 		router.Use(a.RequireAuth)
 		router.HandleFunc("/todo", a.Index, "GET")
 		router.HandleFunc("/todo/new", a.NewTodo, "GET")
-		router.HandleFunc("/todo/create", a.CreateTodo, "GET")
+		router.HandleFunc("/todo/create", a.CreateTodo, "POST")
 		router.HandleFunc("/todo/view/:id", a.GetTodo, "GET")
 		router.HandleFunc("/todo/edit/:id", a.EditTodo, "GET")
 		router.HandleFunc("/todo/update/:id", a.UpdateTodo, "POST")

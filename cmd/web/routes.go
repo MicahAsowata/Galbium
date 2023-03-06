@@ -28,6 +28,6 @@ func (a *application) routes() http.Handler {
 		router.HandleFunc("/todo/delete/:id", a.DeleteTodo, "GET")
 		router.HandleFunc("/user/logout", a.LogoutUser, "POST")
 	})
-
+	router.HandleFunc("/user/forgot_password", a.ForgotPassword, "GET")
 	return router
 }

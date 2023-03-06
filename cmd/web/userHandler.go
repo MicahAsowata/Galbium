@@ -109,3 +109,13 @@ func (a *application) LogoutUser(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/todo", http.StatusSeeOther)
 }
+
+func (a *application) ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	tmpl := pongo2.Must(pongo2.FromFile("./templates/forgot_password.gohtml"))
+
+	err := tmpl.ExecuteWriter(nil, w)
+	if err != nil {
+		http.Error(w, "could not display page", http.StatusInternalServerError)
+		return
+	}
+}

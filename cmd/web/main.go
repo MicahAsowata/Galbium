@@ -30,13 +30,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	queries := models.New(db)
 	sessionManager := scs.New()
 	sessionManager.Store = mysqlstore.New(db)
 	sessionManager.Lifetime = time.Hour * 12
 	sessionManager.Cookie.Persist = false
 	a := application{
-		Queries:        queries,
+		Queries:        &models.Queries{DB: db},
 		Users:          &models.Users{DB: db},
 		SessionManager: sessionManager,
 	}

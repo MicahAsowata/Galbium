@@ -79,11 +79,11 @@ func (u *Users) Authenticate(ctx context.Context, arg AuthUserParams) (int, erro
 	return id, nil
 }
 
-const getUser = `SELECT username FROM users WHERE id = ?`
+const getUserName = `SELECT username FROM users WHERE id = ?`
 
 func (u *Users) Get(ctx context.Context, id int) (string, error) {
 	var username string
-	err := u.DB.QueryRowContext(ctx, getUser, id).Scan(&username)
+	err := u.DB.QueryRowContext(ctx, getUserName, id).Scan(&username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", errors.New("the information you put in weren't correct")
@@ -91,4 +91,34 @@ func (u *Users) Get(ctx context.Context, id int) (string, error) {
 		return "", err
 	}
 	return username, nil
+}
+
+const resetPassword = `UPDATE users SET password_hash = ? WHERE email = ?`
+const findAccount = `SELECT EXISTS(SELECT email FROM users WHERE email = ?)`
+
+type ResetPasswordParams struct {
+	Email    string
+	Password string
+}
+
+func (u *Users) ResetPassword(ctx context.Context, arg ResetPasswordParams) error {
+	var exists bool
+
+	err := u.DB.QueryRowContext(ctx, findAccount, arg.Email).Scan(&exists)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return errors.New("we no see your account")
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(arg.Password), 12)
+	if err != nil {
+		return err
+	}
+	err = u.DB.QueryRowContext(ctx, resetPassword, arg.Email, hashedPassword).Err()
+	if err != nil {
+		return err
+	}
+	return nil
 }

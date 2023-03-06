@@ -119,3 +119,36 @@ func (a *application) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (a *application) ResetPassword(w http.ResponseWriter, r *http.Request) {
+	resetData, err := forms.Parse(r)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	validator := resetData.Validator()
+	validator.Require("email")
+	validator.MatchEmail("email")
+	validator.Require("password")
+	validator.LengthRange("password", 8, 280)
+	validator.Require("confirm_password")
+	validator.Equal("password", "confirm_password")
+	validator.Equal("confirm_password", "password")
+
+	if validator.HasErrors() {
+		fmt.Fprintln(w, "Invalid data")
+		return
+	}
+	err = a.Users.ResetPassword(r.Context(), models.ResetPasswordParams{
+		Email:    resetData.Get("email"),
+		Password: resetData.Get("password"),
+	})
+
+	if err != nil {
+		fmt.Fprintln(w, "could not update your password")
+		fmt.Fprintln(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+}

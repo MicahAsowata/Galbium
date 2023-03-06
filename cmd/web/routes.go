@@ -29,5 +29,7 @@ func (a *application) routes() http.Handler {
 		router.HandleFunc("/user/logout", a.LogoutUser, "POST")
 	})
 	router.HandleFunc("/user/forgot_password", a.ForgotPassword, "GET")
+	router.HandleFunc("/user/reset_password", a.ResetPassword, "POST")
+
 	return router
 }

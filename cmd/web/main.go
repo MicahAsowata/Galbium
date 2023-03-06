@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/MicahAsowata/Galbium/internal/models"
@@ -24,7 +25,12 @@ func main() {
 	if err != nil {
 		log.Fatal("could not load the .env file")
 	}
-	dsn := "galbius:galbius@/galbius?parseTime=true"
+	// dsn := "galbius:galbius@/galbius?parseTime=true"
+	dbUserName := os.Getenv("DB_USERNAME")
+	dbName := os.Getenv("DB_NAME")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dsn := dbUserName + ":" + dbPassword + "@" + dbHost + "/" + dbName + "?parseTime=true"
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatal(err)
@@ -39,8 +45,9 @@ func main() {
 		Users:          &models.Users{DB: db},
 		SessionManager: sessionManager,
 	}
-	log.Println("Starting server for http://localhost:4000")
-	err = http.ListenAndServe(":4000", a.routes())
+	port := ":" + os.Getenv("PORT")
+	log.Println("Starting server for http://localhost" + port)
+	err = http.ListenAndServe(port, a.routes())
 	if err != nil {
 		log.Fatal(err)
 	}

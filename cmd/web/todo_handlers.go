@@ -25,7 +25,7 @@ func (a *application) Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *application) NewTodo(w http.ResponseWriter, r *http.Request) {
-	tmpl := pongo2.Must(pongo2.FromFile("./templates/createTodo.gohtml"))
+	tmpl := pongo2.Must(pongo2.FromFile("./templates/create_todo.gohtml"))
 	err := tmpl.ExecuteWriter(nil, w)
 	if err != nil {
 		http.Error(w, "Error displaying page", http.StatusInternalServerError)
@@ -61,7 +61,7 @@ func (a *application) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, path, http.StatusSeeOther)
 }
 func (a *application) GetTodo(w http.ResponseWriter, r *http.Request) {
-	tmpl := pongo2.Must(pongo2.FromFile("./templates/view.gohtml"))
+	tmpl := pongo2.Must(pongo2.FromFile("./templates/view_todo.gohtml"))
 	id, err := strconv.Atoi(flow.Param(r.Context(), "id"))
 	if err != nil {
 		log.Fatal(err)
@@ -81,7 +81,7 @@ func (a *application) GetTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *application) Index(w http.ResponseWriter, r *http.Request) {
-	tmpl := pongo2.Must(pongo2.FromFile("./templates/todoIndex.gohtml"))
+	tmpl := pongo2.Must(pongo2.FromFile("./templates/todo_index.gohtml"))
 
 	todos, err := a.Queries.ListTodo(r.Context())
 	if err != nil {
@@ -104,7 +104,7 @@ func (a *application) Index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func (a *application) EditTodo(w http.ResponseWriter, r *http.Request) {
-	tmpl := pongo2.Must(pongo2.FromFile("./templates/editTodo.gohtml"))
+	tmpl := pongo2.Must(pongo2.FromFile("./templates/edit_todo.gohtml"))
 	id, err := strconv.Atoi(flow.Param(r.Context(), "id"))
 	if err != nil {
 		log.Fatal(err)

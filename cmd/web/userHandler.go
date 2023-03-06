@@ -57,7 +57,7 @@ func (a *application) SignUpUserPost(w http.ResponseWriter, r *http.Request) {
 
 func (a *application) LoginUser(w http.ResponseWriter, r *http.Request) {
 	tmpl := pongo2.Must(pongo2.FromFile("./templates/login.gohtml"))
-	err := tmpl.ExecuteWriter(nil, w)
+	err := tmpl.ExecuteWriter(pongo2.Context{"loggedin": a.IsAuthenticated(r)}, w)
 	if err != nil {
 		http.Error(w, "could not display page", http.StatusInternalServerError)
 		return

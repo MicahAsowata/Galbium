@@ -15,6 +15,7 @@ require github.com/dustin/go-humanize v1.0.1
 require github.com/go-chi/chi/v5 v5.0.8
 
 require (
+	github.com/alexedwards/flow v0.0.0-20220806114457-cf11be9e0e03
 	github.com/alexedwards/scs/mysqlstore v0.0.0-20230217120314-6b1bedc0f08c
 	github.com/alexedwards/scs/v2 v2.5.0
 	golang.org/x/crypto v0.6.0

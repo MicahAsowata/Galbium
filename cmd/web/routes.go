@@ -3,29 +3,31 @@ package main
 import (
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/alexedwards/flow"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
 func (a *application) routes() http.Handler {
-	router := chi.NewRouter()
-	router.Use(middleware.Logger)
-	router.Use(middleware.CleanPath)
+	router := flow.New()
 	router.Use(middleware.Recoverer)
+	router.Use(middleware.Logger)
 	router.Use(a.SessionManager.LoadAndSave)
-	router.NotFound(a.NotFound)
-	router.Get("/", a.Home)
-	router.Get("/todo/new", a.NewTodo)
-	router.Post("/todo/create", a.CreateTodo)
-	router.Get("/todo/view/{id}", a.GetTodo)
-	router.Get("/todo", a.Index)
-	router.Get("/todo/edit/{id}", a.EditTodo)
-	router.Post("/todo/update/{id}", a.UpdateTodo)
-	router.Get("/todo/delete/{id}", a.DeleteTodo)
-	router.Get("/user/signup", a.SignUpUser)
-	router.Post("/user/signup", a.SignUpUserPost)
-	router.Get("/user/login", a.LoginUser)
-	router.Post("/user/login", a.LoginUserPost)
-	router.Post("/user/logout", a.LogoutUser)
+	router.HandleFunc("/", a.Home, "GET")
+	router.HandleFunc("/user/signup", a.SignUpUser, "GET")
+	router.HandleFunc("/user/signup", a.SignUpUserPost, "POST")
+	router.HandleFunc("/user/login", a.LoginUser, "GET")
+	router.HandleFunc("/user/login", a.LoginUserPost, "POST")
+	router.Group(func(m *flow.Mux) {
+		router.Use(a.RequireAuth)
+		router.HandleFunc("/todo", a.Index, "GET")
+		router.HandleFunc("/todo/new", a.NewTodo, "GET")
+		router.HandleFunc("/todo/create", a.CreateTodo, "GET")
+		router.HandleFunc("/todo/view/:id", a.GetTodo, "GET")
+		router.HandleFunc("/todo/edit/:id", a.EditTodo, "GET")
+		router.HandleFunc("/todo/update/:id", a.UpdateTodo, "POST")
+		router.HandleFunc("/todo/delete/:id", a.DeleteTodo, "GET")
+		router.HandleFunc("/user/logout", a.LogoutUser, "POST")
+	})
+
 	return router
 }

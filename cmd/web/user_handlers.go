@@ -131,11 +131,35 @@ func (a *application) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	validator.Require("password")
 	validator.LengthRange("password", 8, 280)
 	validator.Require("confirm_password")
-	validator.Equal("password", "confirm_password")
 	validator.Equal("confirm_password", "password")
 
 	if validator.HasErrors() {
-		fmt.Fprintln(w, "Invalid data")
+		tmpl := pongo2.Must(pongo2.FromFile("./templates/forgot_password.gohtml"))
+		errorMap := validator.ErrorMap()
+		var emailFieldErrors string
+		if len(errorMap["email"]) > 0 {
+			emailFieldErrors = "Your email seems invalid"
+		} else {
+			emailFieldErrors = ""
+		}
+		var passwordFieldErrors string
+		if len(errorMap["password"]) > 0 {
+			passwordFieldErrors = "Your password must be be more than 8 characters"
+		} else {
+			passwordFieldErrors = ""
+		}
+		var confirmPasswordFieldErrors string
+		if len(errorMap["confirm_password"]) > 0 {
+			confirmPasswordFieldErrors = "They are not equal"
+		} else {
+			confirmPasswordFieldErrors = ""
+		}
+
+		err := tmpl.ExecuteWriter(pongo2.Context{"emailFieldErrors": emailFieldErrors, "passwordFieldErrors": passwordFieldErrors, "confirmPasswordFieldErrors": confirmPasswordFieldErrors, "emailFieldData": resetData.Get("email")}, w)
+		if err != nil {
+			http.Error(w, "could not display page", http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 	err = a.Users.ResetPassword(r.Context(), models.ResetPasswordParams{
@@ -144,8 +168,12 @@ func (a *application) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		fmt.Fprintln(w, "could not update your password")
-		fmt.Fprintln(w, err)
+		tmpl := pongo2.Must(pongo2.FromFile("./templates/forgot_password.gohtml"))
+		err := tmpl.ExecuteWriter(pongo2.Context{"notUpdated": "password could not be reset"}, w)
+		if err != nil {
+			http.Error(w, "could not display page", http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 

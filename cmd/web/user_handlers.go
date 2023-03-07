@@ -64,12 +64,12 @@ func (a *application) LoginUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *application) LoginUserPost(w http.ResponseWriter, r *http.Request) {
-	todoData, err := forms.Parse(r)
+	loginData, err := forms.Parse(r)
 	if err != nil {
 		a.Logger.Error(err.Error())
 	}
 
-	validator := todoData.Validator()
+	validator := loginData.Validator()
 	validator.Require("email")
 	validator.MatchEmail("email")
 	validator.MaxLength("email", 280)
@@ -77,21 +77,45 @@ func (a *application) LoginUserPost(w http.ResponseWriter, r *http.Request) {
 	validator.LengthRange("password", 8, 280)
 
 	if validator.HasErrors() {
-		fmt.Fprintln(w, "Invalid data")
+		tmpl := pongo2.Must(pongo2.FromFile("./templates/login.gohtml"))
+		errorMap := validator.ErrorMap()
+		var emailFieldErrors string
+		if len(errorMap["email"]) > 0 {
+			emailFieldErrors = "Your email seems invalid"
+		} else {
+			emailFieldErrors = ""
+		}
+		var passwordFieldErrors string
+		if len(errorMap["password"]) > 0 {
+			passwordFieldErrors = "Your password must be be more than 8 characters"
+		} else {
+			passwordFieldErrors = ""
+		}
+		err := tmpl.ExecuteWriter(pongo2.Context{"loggedin": a.IsAuthenticated(r), "emailFieldError": emailFieldErrors, "passwordFieldError": passwordFieldErrors, "emailFieldData": loginData.Get("email")}, w)
+		if err != nil {
+			http.Error(w, "could not display page", http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 	user_id, err := a.Users.Authenticate(r.Context(), models.AuthUserParams{
-		Email:    todoData.Get("email"),
-		Password: todoData.Get("password"),
+		Email:    loginData.Get("email"),
+		Password: loginData.Get("password"),
 	})
 
 	if err != nil {
-		a.Logger.Error(err.Error())
+		tmpl := pongo2.Must(pongo2.FromFile("./templates/login.gohtml"))
+		err := tmpl.ExecuteWriter(pongo2.Context{"loginError": "sorry, we could not log you in", "loggedin": a.IsAuthenticated(r)}, w)
+		if err != nil {
+			http.Error(w, "could not display page", http.StatusInternalServerError)
+			return
+		}
+		return
 	}
 	a.SessionManager.RenewToken(r.Context())
 	a.SessionManager.Put(r.Context(), "userID", user_id)
 	a.SessionManager.RememberMe(r.Context(), true)
-	http.Redirect(w, r, "/todo", http.StatusSeeOther)
+	http.Redirect(w, r, "/user/signup", http.StatusSeeOther)
 }
 
 func (a *application) LogoutUser(w http.ResponseWriter, r *http.Request) {
@@ -106,7 +130,7 @@ func (a *application) LogoutUser(w http.ResponseWriter, r *http.Request) {
 
 	a.SessionManager.Put(r.Context(), "flash", "logged out successfully")
 
-	http.Redirect(w, r, "/todo", http.StatusSeeOther)
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
 
 func (a *application) ForgotPassword(w http.ResponseWriter, r *http.Request) {

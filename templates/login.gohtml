@@ -8,15 +8,21 @@
 </head>
 <body>
     <form action="/user/login" method="post">
+        {%if loginError != ""%}
+            <label>{{loginError}}</label>
+        {%endif%}
+        {% if emailFieldError != ""%}
+            <label for="email">{{emailFieldError}}</label>
+        {%endif%}
         <label for="email">Email</label>
-        <input type="email" name="email">
+        <input type="email" name="email" value="{{emailFieldData}}">
 
         <label for="password">Password</label>
         <input type="password" name="password">
 
         <input type="submit" value="Login">
     </form>
-    {%if loggedin == false%}
+    {%if !loggedin%}
     <form action="/user/logout" method="post">
         <input type="submit" value="log out">
     </form>

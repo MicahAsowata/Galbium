@@ -8,16 +8,28 @@
 </head>
 <body>
     <form action="/user/signup" method="post">
+        {%if userSignupError != ""%}
+            <label>{{userSignupError}}</label>
+        {%endif%}
+        {%if nameFieldError != ""%}
+            <label>{{nameFieldError}}</label>
+        {%endif%}
         <label for="name">Name</label>
-        <input type="text" name="name">
-
-        <label for="name">Email</label>
-        <input type="email" name="email">
-
-        <label for="name">Username</label>
-        <input type="text" name="username">
-
-        <label for="name">Password</label>
+        <input type="text" name="name" value="{{nameFieldData}}">
+        {%if emailFieldError != ""%}
+            <label>{{emailFieldError}}</label>
+        {%endif%}
+        <label for="email">Email</label>
+        <input type="email" name="email" value="{{emailFieldData}}">
+        {%if usernameFieldError != ""%}
+            <label>{{usernameFieldError}}</label>
+        {%endif%}
+        <label for="username">Username</label>
+        <input type="text" name="username" value="{{usernameFieldData}}">
+        {%if passwordFieldError != ""%}
+            <label>{{passwordFieldError}}</label>
+        {%endif%}
+        <label for="password">Password</label>
         <input type="password" name="password">
 
         <input type="submit" value="Sign up">

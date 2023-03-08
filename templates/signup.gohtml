@@ -1,4 +1,4 @@
-{%include "./partials/nav.gohtml" with title="Sign up page" isAuthenticated=isAuthenticated %}
+{%include "./partials/nav.gohtml" with title="Sign up" isAuthenticated=isAuthenticated %}
     <form action="/user/signup" method="post">
         {%if userSignupError != ""%}
             <label>{{userSignupError}}</label>

@@ -17,6 +17,8 @@ func (a *application) routes() http.Handler {
 	router.HandleFunc("/user/signup", a.SignUpUserPost, "POST")
 	router.HandleFunc("/user/login", a.LoginUser, "GET")
 	router.HandleFunc("/user/login", a.LoginUserPost, "POST")
+	router.HandleFunc("/user/forgot_password", a.ForgotPassword, "GET")
+	router.HandleFunc("/user/reset_password", a.ResetPassword, "POST")
 	router.Group(func(m *flow.Mux) {
 		router.Use(a.RequireAuth)
 		router.HandleFunc("/todo", a.Index, "GET")
@@ -28,8 +30,5 @@ func (a *application) routes() http.Handler {
 		router.HandleFunc("/todo/delete/:id", a.DeleteTodo, "GET")
 		router.HandleFunc("/user/logout", a.LogoutUser, "POST")
 	})
-	router.HandleFunc("/user/forgot_password", a.ForgotPassword, "GET")
-	router.HandleFunc("/user/reset_password", a.ResetPassword, "POST")
-
 	return router
 }

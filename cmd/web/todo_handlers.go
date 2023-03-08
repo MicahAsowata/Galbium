@@ -16,28 +16,57 @@ import (
 
 func (a *application) Home(w http.ResponseWriter, r *http.Request) {
 	tmpl := pongo2.Must(pongo2.FromFile("./templates/home.gohtml"))
-	err := tmpl.ExecuteWriter(nil, w)
+	isAuthenticated := a.IsAuthenticated(r)
+	err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated}, w)
 	if err != nil {
-		http.Error(w, "Error displaying page", http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 }
 
 func (a *application) NewTodo(w http.ResponseWriter, r *http.Request) {
 	tmpl := pongo2.Must(pongo2.FromFile("./templates/create_todo.gohtml"))
-	err := tmpl.ExecuteWriter(nil, w)
+	isAuthenticated := a.IsAuthenticated(r)
+	err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated}, w)
 	if err != nil {
-		http.Error(w, "Error displaying page", http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 }
 func (a *application) CreateTodo(w http.ResponseWriter, r *http.Request) {
+	isAuthenticated := a.IsAuthenticated(r)
 	todoData, err := forms.Parse(r)
 	if err != nil {
 		a.Logger.Error(err.Error())
 	}
 	validator := todoData.Validator()
 	validator.Require("name")
+	validator.MaxLength("name", 280)
+	validator.Require("details")
+	validator.MaxLength("details", 10000)
 	if validator.HasErrors() {
-		http.Error(w, "invalid data", http.StatusBadRequest)
+		tmpl := pongo2.Must(pongo2.FromFile("./templates/create_todo.gohtml"))
+		errorMap := validator.ErrorMap()
+		var nameFieldError string
+		var detailFieldError string
+		if len(errorMap["name"]) > 0 {
+			nameFieldError = "Invalid task name"
+		} else {
+			nameFieldError = ""
+		}
+
+		if len(errorMap["details"]) > 0 {
+			detailFieldError = "Invalid task details"
+		} else {
+			detailFieldError = ""
+		}
+		nameFieldData := todoData.Get("name")
+		detailFieldData := todoData.Get("detail")
+		err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated, "nameFieldError": nameFieldError, "detailFieldError": detailFieldError, "nameFieldData": nameFieldData, "detailFieldData": detailFieldData}, w)
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 	results, err := a.Queries.CreateTodo(r.Context(), models.CreateTodoParams{
@@ -48,33 +77,49 @@ func (a *application) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		a.Logger.Error(err.Error())
+		tmpl := pongo2.Must(pongo2.FromFile("./templates/create_todo.gohtml"))
+		createTodoError := "Task not created"
+		err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated, "createTodoError": createTodoError}, w)
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		return
 	}
 
 	insertedID, err := results.LastInsertId()
 	if err != nil {
 		a.Logger.Error(err.Error())
+		return
 	}
 	path := fmt.Sprintf("/todo/view/%d", int(insertedID))
-	a.SessionManager.Put(r.Context(), "flash", "todo created successfully")
+	a.SessionManager.Put(r.Context(), "flash", "Task created successfully")
 	http.Redirect(w, r, path, http.StatusSeeOther)
 }
 func (a *application) GetTodo(w http.ResponseWriter, r *http.Request) {
 	tmpl := pongo2.Must(pongo2.FromFile("./templates/view_todo.gohtml"))
+	isAuthenticated := a.IsAuthenticated(r)
 	userID := a.SessionManager.GetInt(r.Context(), "userID")
 	id, err := strconv.Atoi(flow.Param(r.Context(), "id"))
 	if err != nil {
 		a.Logger.Error(err.Error())
+		return
 	}
 
 	todo, err := a.Queries.GetTodo(r.Context(), id, userID)
 	if err != nil {
-		a.Logger.Error(err.Error())
+		tmpl := pongo2.Must(pongo2.FromFile("./templates/not_found.gohtml"))
+		err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated}, w)
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		return
 	}
 	flash := a.SessionManager.PopString(r.Context(), "flash")
-	err = tmpl.ExecuteWriter(pongo2.Context{"todo": todo, "created": humanize.Time(todo.Created.UTC()), "flash": flash}, w)
+	err = tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated, "todo": todo, "created": humanize.Time(todo.Created), "flash": flash}, w)
 	if err != nil {
-		http.Error(w, "Error displaying page", http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 }

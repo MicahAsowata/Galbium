@@ -92,7 +92,8 @@ func (a *application) SignUpUserPost(w http.ResponseWriter, r *http.Request) {
 
 func (a *application) LoginUser(w http.ResponseWriter, r *http.Request) {
 	tmpl := pongo2.Must(pongo2.FromFile("./templates/login.gohtml"))
-	err := tmpl.ExecuteWriter(pongo2.Context{"loggedin": a.IsAuthenticated(r)}, w)
+	isAuthenticated := a.IsAuthenticated(r)
+	err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated}, w)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
@@ -173,8 +174,8 @@ func (a *application) LogoutUser(w http.ResponseWriter, r *http.Request) {
 
 func (a *application) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	tmpl := pongo2.Must(pongo2.FromFile("./templates/forgot_password.gohtml"))
-
-	err := tmpl.ExecuteWriter(nil, w)
+	isAuthenticated := a.IsAuthenticated(r)
+	err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated}, w)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

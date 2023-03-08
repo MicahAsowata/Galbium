@@ -10,7 +10,8 @@ import (
 
 func (a *application) SignUpUser(w http.ResponseWriter, r *http.Request) {
 	tmpl := pongo2.Must(pongo2.FromFile("./templates/signup.gohtml"))
-	err := tmpl.ExecuteWriter(nil, w)
+	isAuthenticated := a.IsAuthenticated(r)
+	err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated}, w)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

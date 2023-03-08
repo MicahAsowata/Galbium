@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up Form</title>
-</head>
-<body>
+{%include "./partials/nav.gohtml" with title="Sign up page" isAuthenticated=isAuthenticated %}
     <form action="/user/signup" method="post">
         {%if userSignupError != ""%}
             <label>{{userSignupError}}</label>
@@ -34,5 +26,4 @@
 
         <input type="submit" value="Sign up">
     </form>
-</body>
-</html>
+{%include "./partials/footer.gohtml"%}

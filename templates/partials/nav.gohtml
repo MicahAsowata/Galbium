@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galbius - {{ title }}</title>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li>Galbius</li>
+            {%if !isAuthenticated%}
+            <li><a href="/user/login">Sign in</a></li>
+            <li><a href="/user/signup">Sign up</a></li>
+            {%else%}
+            <li><a href="/todo">Tasks</a></li>
+            <li><a href="/todo/new">New Task</a></li>
+            <li><a href="/user/logout">Sign out</a></li>
+            {%endif%}
+        </ul>
+    </nav>

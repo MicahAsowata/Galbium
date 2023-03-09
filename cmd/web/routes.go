@@ -11,6 +11,7 @@ func (a *application) routes() http.Handler {
 	router := flow.New()
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.Logger)
+	router.Use(a.SecureHeaders)
 	router.Use(a.SessionManager.LoadAndSave)
 	router.HandleFunc("/", a.Home, http.MethodGet)
 	router.HandleFunc("/user/signup", a.SignUpUser, http.MethodGet)

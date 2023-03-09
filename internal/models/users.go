@@ -43,7 +43,7 @@ func (u *Users) Insert(ctx context.Context, arg InsertUsersParams) error {
 	if err != nil {
 		if errors.Is(err, &mySQLError) {
 			if mySQLError.Number == 1062 {
-				return errors.New("it exists already")
+				return ErrUserAlreadyExists
 			}
 		}
 		return err
@@ -65,7 +65,7 @@ func (u *Users) Authenticate(ctx context.Context, arg AuthUserParams) (int, erro
 	err := u.DB.QueryRowContext(ctx, authUser, arg.Email).Scan(&id, &passwordHash)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, errors.New("the information you put in weren't correct")
+			return 0, ErrInvalidData
 		}
 		return 0, err
 	}
@@ -73,7 +73,7 @@ func (u *Users) Authenticate(ctx context.Context, arg AuthUserParams) (int, erro
 	err = bcrypt.CompareHashAndPassword(passwordHash, []byte(arg.Password))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return 0, errors.New("the information you put in weren't correct")
+			return 0, ErrInvalidData
 		}
 		return 0, err
 	}
@@ -88,7 +88,7 @@ func (u *Users) Get(ctx context.Context, id int) (string, error) {
 	err := u.DB.QueryRowContext(ctx, getUserName, id).Scan(&username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return "", errors.New("the information you put in weren't correct")
+			return "", ErrInvalidData
 		}
 		return "", err
 	}
@@ -111,7 +111,7 @@ func (u *Users) ResetPassword(ctx context.Context, arg ResetPasswordParams) erro
 		return err
 	}
 	if !exists {
-		return errors.New("we no see your account")
+		return ErrUserNotFound
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(arg.Password), 12)

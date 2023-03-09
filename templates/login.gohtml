@@ -15,7 +15,7 @@
         <input type="submit" value="Login">
     </form>
     {%if !loggedin%}
-    <form action="/user/logout" method="post">
+    <form action="/user/logout" method="get">
         <input type="submit" value="log out">
     </form>
     {%endif%}

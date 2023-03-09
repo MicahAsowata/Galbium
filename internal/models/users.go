@@ -39,10 +39,12 @@ func (u *Users) Insert(ctx context.Context, arg InsertUsersParams) error {
 		return err
 	}
 	_, err = u.DB.ExecContext(ctx, insertUser, arg.Name, arg.Email, arg.Username, hashedPassword)
+	var mySQLError mysql.MySQLError
 	if err != nil {
-		mySQLErr := err.(*mysql.MySQLError)
-		if mySQLErr.Number == 1062 {
-			return errors.New("it exists already")
+		if errors.Is(err, &mySQLError) {
+			if mySQLError.Number == 1062 {
+				return errors.New("it exists already")
+			}
 		}
 		return err
 	}

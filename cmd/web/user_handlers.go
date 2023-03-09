@@ -87,6 +87,7 @@ func (a *application) SignUpUserPost(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
 	http.Redirect(w, r, "/todo", http.StatusSeeOther)
 }
 
@@ -154,7 +155,7 @@ func (a *application) LoginUserPost(w http.ResponseWriter, r *http.Request) {
 	a.SessionManager.RenewToken(r.Context())
 	a.SessionManager.Put(r.Context(), "userID", user_id)
 	a.SessionManager.RememberMe(r.Context(), true)
-	http.Redirect(w, r, "/user/signup", http.StatusSeeOther)
+	http.Redirect(w, r, "/todo", http.StatusSeeOther)
 }
 
 func (a *application) LogoutUser(w http.ResponseWriter, r *http.Request) {

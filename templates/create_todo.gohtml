@@ -7,12 +7,12 @@
             <label>{{nameFieldError}}</label>
         {%endif%}
         <label for="name">Task Name</label>
-        <input type="text" name="name" value="nameFieldData">
+        <input type="text" name="name" value="{{nameFieldData}}">
         {%if detailFieldError != ""%}
             <label>{{detailFieldError}}</label>
         {%endif%}
         <label for="details">Task Details</label>
-        <input type="text" name="details" value="detailFieldData">
+        <input type="text" name="details" value="{{detailFieldData}}">
 
         <input type="submit" value="Create Todo">
     </form>

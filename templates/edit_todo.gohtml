@@ -1,13 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Todo -{{todo.ID}}</title>
-</head>
-<body>
+{%include "./partials/nav.gohtml" with title=titleString isAuthenticated=isAuthenticated %}
     <form action="/todo/update/{{todo.ID}}" method="post">
+        {%if errorMessage != ""%}
+            <label>{{errorMessage}}</label>
+        {%endif%}
+        {%if nameFieldError != ""%}
+            <label for="name">{{nameFieldError}}</label>
+        {%endif%}
         <label for="name">Task Name</label>
         <input type="text" name="name" value="{{todo.Name}}">
 
@@ -19,6 +17,4 @@
         <input type="checkbox" name="completed">
         <input type="submit" value="Update Task">
     </form>
-
-</body>
-</html>
+{%include "./partials/footer.gohtml"%}

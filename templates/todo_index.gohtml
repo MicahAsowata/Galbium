@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Todos</title>
-</head>
-<body>
+{%include "./partials/nav.gohtml" with title="All Tasks" isAuthenticated=isAuthenticated %}
     {%if username != ""%}
         <p>Hey, {{username}}</p>
     {%endif%}
@@ -15,5 +7,4 @@
         <a href="/todo/view/{{todo.ID}}">See the details</a>
     {%endfor%}
     <a href="/todo/new">Create New Task</a>
-</body>
-</html>
+{%include "./partials/footer.gohtml"%}

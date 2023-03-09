@@ -96,7 +96,7 @@ func (u *Users) Get(ctx context.Context, id int) (string, error) {
 }
 
 const resetPassword = `UPDATE users SET password_hash = ? WHERE email = ?`
-const findAccount = `SELECT EXISTS(SELECT email FROM users WHERE email = ?)`
+const findAccount = `SELECT EXISTS(SELECT true FROM users WHERE email = ?)`
 
 type ResetPasswordParams struct {
 	Email    string

@@ -1,6 +1,8 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+)
 
 func (a *application) IsAuthenticated(r *http.Request) bool {
 	return a.SessionManager.Exists(r.Context(), "userID")

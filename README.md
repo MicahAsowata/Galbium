@@ -14,3 +14,10 @@ It was created to practice what I have learnt in the Let's Go book by Alex Edwar
 2. Tasks are connected to their respective creator
 3. User authentication and authorization
 4. Password reset
+
+## What needs to be done
+1. Add a certificate for security
+2. Use the request context
+3. Use the embed package
+4. Serve CSS and JS
+5. Testing

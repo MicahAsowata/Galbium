@@ -30,7 +30,7 @@ func main() {
 	if err != nil {
 		logger.Error(err.Error())
 	}
-	// dsn := "galbius:galbius@/galbius?parseTime=true"
+
 	dbUserName := os.Getenv("DB_USERNAME")
 	dbName := os.Getenv("DB_NAME")
 	dbPassword := os.Getenv("DB_PASSWORD")
@@ -44,6 +44,7 @@ func main() {
 	sessionManager := scs.New()
 	sessionManager.Store = mysqlstore.New(db)
 	sessionManager.Lifetime = time.Hour * 12
+	sessionManager.Cookie.Secure = true
 	sessionManager.Cookie.Persist = false
 	a := application{
 		Logger:         logger,
@@ -52,8 +53,12 @@ func main() {
 		SessionManager: sessionManager,
 	}
 	port := ":" + os.Getenv("PORT")
+	srv := &http.Server{
+		Addr:    port,
+		Handler: a.routes(),
+	}
 	logger.Info("Starting server for http://localhost" + port)
-	err = http.ListenAndServe(port, a.routes())
+	err = srv.ListenAndServe()
 	if err != nil {
 		logger.Error(err.Error())
 	}

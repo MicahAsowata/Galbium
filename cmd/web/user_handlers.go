@@ -9,7 +9,7 @@ import (
 )
 
 func (a *application) SignUpUser(w http.ResponseWriter, r *http.Request) {
-	tmpl := pongo2.Must(pongo2.FromFile("./templates/signup.gohtml"))
+	tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/signup.gohtml"))
 	isAuthenticated := a.IsAuthenticated(r)
 	err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated}, w)
 	if err != nil {
@@ -36,7 +36,7 @@ func (a *application) SignUpUserPost(w http.ResponseWriter, r *http.Request) {
 	validator.LengthRange("password", 8, 280)
 
 	if validator.HasErrors() {
-		tmpl := pongo2.Must(pongo2.FromFile("./templates/signup.gohtml"))
+		tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/signup.gohtml"))
 		errorMap := validator.ErrorMap()
 		var nameFieldErrors string
 		if len(errorMap["email"]) > 0 {
@@ -79,7 +79,7 @@ func (a *application) SignUpUserPost(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		tmpl := pongo2.Must(pongo2.FromFile("./templates/signup.gohtml"))
+		tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/signup.gohtml"))
 		err := tmpl.ExecuteWriter(pongo2.Context{"userSignupError": "We could not sign you up"}, w)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -92,7 +92,7 @@ func (a *application) SignUpUserPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *application) LoginUser(w http.ResponseWriter, r *http.Request) {
-	tmpl := pongo2.Must(pongo2.FromFile("./templates/login.gohtml"))
+	tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/login.gohtml"))
 	isAuthenticated := a.IsAuthenticated(r)
 	err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated}, w)
 	if err != nil {
@@ -115,7 +115,7 @@ func (a *application) LoginUserPost(w http.ResponseWriter, r *http.Request) {
 	validator.LengthRange("password", 8, 280)
 
 	if validator.HasErrors() {
-		tmpl := pongo2.Must(pongo2.FromFile("./templates/login.gohtml"))
+		tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/login.gohtml"))
 		errorMap := validator.ErrorMap()
 		var emailFieldErrors string
 		if len(errorMap["email"]) > 0 {
@@ -144,7 +144,7 @@ func (a *application) LoginUserPost(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		tmpl := pongo2.Must(pongo2.FromFile("./templates/login.gohtml"))
+		tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/login.gohtml"))
 		err := tmpl.ExecuteWriter(pongo2.Context{"loginError": "sorry, we could not log you in", "loggedin": a.IsAuthenticated(r)}, w)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -174,7 +174,7 @@ func (a *application) LogoutUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *application) ForgotPassword(w http.ResponseWriter, r *http.Request) {
-	tmpl := pongo2.Must(pongo2.FromFile("./templates/forgot_password.gohtml"))
+	tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/forgot_password.gohtml"))
 	isAuthenticated := a.IsAuthenticated(r)
 	err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated}, w)
 	if err != nil {
@@ -198,7 +198,7 @@ func (a *application) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	validator.Equal("confirm_password", "password")
 
 	if validator.HasErrors() {
-		tmpl := pongo2.Must(pongo2.FromFile("./templates/forgot_password.gohtml"))
+		tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/forgot_password.gohtml"))
 		errorMap := validator.ErrorMap()
 		var emailFieldErrors string
 		if len(errorMap["email"]) > 0 {
@@ -232,7 +232,7 @@ func (a *application) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		tmpl := pongo2.Must(pongo2.FromFile("./templates/forgot_password.gohtml"))
+		tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/forgot_password.gohtml"))
 		err := tmpl.ExecuteWriter(pongo2.Context{"notUpdated": "password could not be reset"}, w)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

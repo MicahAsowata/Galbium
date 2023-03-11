@@ -15,7 +15,7 @@ import (
 )
 
 func (a *application) Home(w http.ResponseWriter, r *http.Request) {
-	tmpl := pongo2.Must(pongo2.FromFile("./templates/home.gohtml"))
+	tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/home.gohtml"))
 	isAuthenticated := a.IsAuthenticated(r)
 	err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated}, w)
 	if err != nil {
@@ -25,7 +25,7 @@ func (a *application) Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *application) NewTodo(w http.ResponseWriter, r *http.Request) {
-	tmpl := pongo2.Must(pongo2.FromFile("./templates/create_todo.gohtml"))
+	tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/create_todo.gohtml"))
 	isAuthenticated := a.IsAuthenticated(r)
 	err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated}, w)
 	if err != nil {
@@ -45,7 +45,7 @@ func (a *application) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	validator.Require("details")
 	validator.MaxLength("details", 10000)
 	if validator.HasErrors() {
-		tmpl := pongo2.Must(pongo2.FromFile("./templates/create_todo.gohtml"))
+		tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/create_todo.gohtml"))
 		errorMap := validator.ErrorMap()
 		var nameFieldError string
 		var detailFieldError string
@@ -77,7 +77,7 @@ func (a *application) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		tmpl := pongo2.Must(pongo2.FromFile("./templates/create_todo.gohtml"))
+		tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/create_todo.gohtml"))
 		createTodoError := "Task not created"
 		err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated, "createTodoError": createTodoError}, w)
 		if err != nil {
@@ -97,7 +97,7 @@ func (a *application) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, path, http.StatusSeeOther)
 }
 func (a *application) GetTodo(w http.ResponseWriter, r *http.Request) {
-	tmpl := pongo2.Must(pongo2.FromFile("./templates/view_todo.gohtml"))
+	tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/view_todo.gohtml"))
 	isAuthenticated := a.IsAuthenticated(r)
 	userID := a.SessionManager.GetInt(r.Context(), "userID")
 	id, err := strconv.Atoi(flow.Param(r.Context(), "id"))
@@ -108,7 +108,7 @@ func (a *application) GetTodo(w http.ResponseWriter, r *http.Request) {
 
 	todo, err := a.Queries.GetTodo(r.Context(), id, userID)
 	if err != nil {
-		tmpl := pongo2.Must(pongo2.FromFile("./templates/not_found.gohtml"))
+		tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/not_found.gohtml"))
 		message := "Task not found"
 		err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated, "message": message}, w)
 		if err != nil {
@@ -127,14 +127,14 @@ func (a *application) GetTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *application) Index(w http.ResponseWriter, r *http.Request) {
-	tmpl := pongo2.Must(pongo2.FromFile("./templates/todo_index.gohtml"))
+	tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/todo_index.gohtml"))
 	isAuthenticated := a.IsAuthenticated(r)
 	userID := a.SessionManager.GetInt(r.Context(), "userID")
 
 	todos, err := a.Queries.ListTodo(r.Context(), userID)
 	if err != nil {
 		if err != nil {
-			tmpl := pongo2.Must(pongo2.FromFile("./templates/not_found.gohtml"))
+			tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/not_found.gohtml"))
 			message := "you have no tasks"
 			err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated, "message": message}, w)
 			if err != nil {
@@ -159,7 +159,7 @@ func (a *application) Index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func (a *application) EditTodo(w http.ResponseWriter, r *http.Request) {
-	tmpl := pongo2.Must(pongo2.FromFile("./templates/edit_todo.gohtml"))
+	tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/edit_todo.gohtml"))
 	isAuthenticated := a.IsAuthenticated(r)
 	userID := a.SessionManager.GetInt(r.Context(), "userID")
 	id, err := strconv.Atoi(flow.Param(r.Context(), "id"))
@@ -168,7 +168,7 @@ func (a *application) EditTodo(w http.ResponseWriter, r *http.Request) {
 	}
 	todo, err := a.Queries.GetTodo(r.Context(), id, userID)
 	if errors.Is(err, sql.ErrNoRows) {
-		tmpl := pongo2.Must(pongo2.FromFile("./templates/not_found.gohtml"))
+		tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/not_found.gohtml"))
 		message := "you are trying to edit a non-existent task"
 		err := tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated, "message": message}, w)
 		if err != nil {
@@ -207,7 +207,7 @@ func (a *application) UpdateTodo(w http.ResponseWriter, r *http.Request) {
 		nameFieldError = ""
 	}
 	if validator.HasErrors() {
-		tmpl := pongo2.Must(pongo2.FromFile("./templates/edit_todo.gohtml"))
+		tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/edit_todo.gohtml"))
 		nameFieldData := updateTodoData.Get("name")
 		err = tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated, "nameFieldError": nameFieldError, "nameFieldData": nameFieldData}, w)
 		if err != nil {
@@ -232,7 +232,7 @@ func (a *application) UpdateTodo(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		tmpl := pongo2.Must(pongo2.FromFile("./templates/edit_todo.gohtml"))
+		tmpl := pongo2.Must(pongo2.FromFile("./ui/templates/edit_todo.gohtml"))
 		errorMessage := "task could not be updated"
 		err = tmpl.ExecuteWriter(pongo2.Context{"isAuthenticated": isAuthenticated, "errorMessage": errorMessage}, w)
 		if err != nil {

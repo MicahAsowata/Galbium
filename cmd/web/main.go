@@ -57,6 +57,7 @@ func main() {
 		Addr:    port,
 		Handler: a.routes(),
 	}
+
 	logger.Info("Starting server for http://localhost" + port)
 	err = srv.ListenAndServe()
 	if err != nil {

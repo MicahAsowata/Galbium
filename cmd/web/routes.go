@@ -9,12 +9,10 @@ import (
 
 func (a *application) routes() http.Handler {
 	router := flow.New()
-	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.Logger)
 	router.Use(a.SecureHeaders)
 	router.Use(a.SessionManager.LoadAndSave)
-	router.Handle("/static/", http.StripPrefix("/static", fileServer))
 	router.HandleFunc("/", a.Home, http.MethodGet)
 	router.HandleFunc("/user/signup", a.SignUpUser, http.MethodGet)
 	router.HandleFunc("/user/signup", a.SignUpUserPost, http.MethodPost)
